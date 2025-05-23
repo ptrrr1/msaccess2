@@ -48,6 +48,11 @@ class CLI():
     def union(operands):
         operands.union()
 
+    @cli.command(['cartesian','cart'])
+    @pass_operands
+    def cartesian(operands):
+        operands.cartesian()
+
     @cli.command('all',
                  help='Do all operations')
     @pass_operands
@@ -56,3 +61,4 @@ class CLI():
         operands.right_not_left()
         operands.intersection()
         operands.union()
+        operands.cartesian()

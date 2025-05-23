@@ -51,37 +51,33 @@ class Operands():
 
 		return df
 
+	@staticmethod
+	def write(df, sheet_name, output):
+		with pd.ExcelWriter(
+			output,
+			engine='openpyxl',
+			mode='a'
+		) as writer:
+			df.to_excel(
+	            writer,
+	            sheet_name=sheet_name,
+	            index=False
+	        )
+		
+
 	def left_not_right(self):
 		lnr = self.dfleft.loc[
 				~self.dfleft[self.col_name_left].isin(self.col_right)
 			]
 
-		with pd.ExcelWriter(
-			self.output,
-			engine='openpyxl',
-			mode='a'
-		) as writer:
-			lnr.to_excel(
-	            writer,
-	            sheet_name="left_not_right",
-	            index=False
-	        )
-
+		Operands.write(lnr, 'left_not_right', self.output)
+		
 	def right_not_left(self):
 		rnl = self.dfright.loc[
 				~self.dfright[self.col_name_right].isin(self.col_left)
 			]
 
-		with pd.ExcelWriter(
-			self.output,
-			engine='openpyxl',
-			mode='a'
-		) as writer:
-			rnl.to_excel(
-		        writer,
-		        sheet_name="right_not_left",
-		        index=False
-		    )
+		Operands.write(rnl, 'right_not_left', self.output)
 
 	def intersection(self):
 		dfright = self.dfright.rename(columns={self.col_name_right: self.col_name_left})
@@ -90,21 +86,11 @@ class Operands():
 		                    self.dfleft,
 		                    dfright,
 		                    how='inner',
-		                    left_on=self.col_name_left,
-		                    right_on=self.col_name_left,
+		                    on=self.col_name_left,
 		                    suffixes=('_left', '_right')
 		                )
 
-		with pd.ExcelWriter(
-			self.output,
-			engine='openpyxl',
-			mode='a'
-		) as writer:
-			intersec.to_excel(
-	            writer,
-	            sheet_name='intersection',
-	            index=False
-	        )
+		Operands.write(intersec, 'intersection', self.output)
 
 	def union(self):
 		dfright = self.dfright.rename(columns={self.col_name_right: self.col_name_left})
@@ -120,13 +106,14 @@ class Operands():
 		
 		union_distinct = union.drop_duplicates()
 		
-		with pd.ExcelWriter(
-			self.output,
-			engine='openpyxl',
-			mode='a'
-		) as writer:
-			union_distinct.to_excel(
-	            writer,
-	            sheet_name='union',
-	            index=False
-	        )
+		Operands.write(union_distinct, 'union_distinct', self.output)
+
+	def cartesian(self):
+		cartesian = pd.merge(
+		                    self.dfleft,
+		                    self.dfright,
+		                    how='cross',
+		                    suffixes=('_left', '_right')
+		                )
+
+		Operands.write(cartesian, 'cartesian_product', self.output)
