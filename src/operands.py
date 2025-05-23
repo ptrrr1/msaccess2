@@ -1,6 +1,5 @@
 from utils import Utils
 import pandas as pd
-import os
 
 class Operands():
 	def __init__(self, fleft, fright, cleft, cright, output):
@@ -85,14 +84,16 @@ class Operands():
 		    )
 
 	def intersection(self):
+		dfright = self.dfright.rename(columns={self.col_name_right: self.col_name_left})
+		
 		intersec = pd.merge(
-	                    self.dfleft,
-	                    self.dfright,
-	                    how='inner',
-	                    left_on=self.col_name_left,
-	                    right_on=self.col_name_right,
-	                    suffixes=('_left', '_right')
-	                )
+		                    self.dfleft,
+		                    dfright,
+		                    how='inner',
+		                    left_on=self.col_name_left,
+		                    right_on=self.col_name_left,
+		                    suffixes=('_left', '_right')
+		                )
 
 		with pd.ExcelWriter(
 			self.output,
@@ -106,4 +107,26 @@ class Operands():
 	        )
 
 	def union(self):
-		pass
+		dfright = self.dfright.rename(columns={self.col_name_right: self.col_name_left})
+		
+		union = pd.concat([
+		                  	self.dfleft,
+		                  	dfright
+		                  ],
+		                  ignore_index=True,
+		                  names=list(self.dfleft.columns),
+		                  join='inner' # Keep only overlapping columns
+		                )
+		
+		union_distinct = union.drop_duplicates()
+		
+		with pd.ExcelWriter(
+			self.output,
+			engine='openpyxl',
+			mode='a'
+		) as writer:
+			union_distinct.to_excel(
+	            writer,
+	            sheet_name='union',
+	            index=False
+	        )
