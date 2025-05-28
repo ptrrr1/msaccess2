@@ -43,12 +43,13 @@ class CLI():
         operands.intersection()
 
     @cli.command('union',
-                 help='Performs a Full Outer Join (unimplemented)')
+                 help='Performs a Union, concatenating Sets vertically.')
     @pass_operands
     def union(operands):
         operands.union()
 
-    @cli.command(['cartesian','cart'])
+    @cli.command(['cartesian','cart'],
+                 help='Do a cartesian product of the Sets.')
     @pass_operands
     def cartesian(operands):
         operands.cartesian()

@@ -28,11 +28,21 @@ class CustomMultiCommand(click.Group):
     def command(self, *args, **kwargs):
         """
         Receives a list of names and sets all after the first as aliases.
+        Edited by me to make commands and aliases into one line.
         By Stephen Rauch on StackOverflow
         """
         def decorator(f):
             if isinstance(args[0], list):
                 _args = [args[0][0]] + list(args[1:])
+
+                # Add 'command, alias1, ..., aliasn' as command
+                t = ', '.join(args[0])
+                cmd = super(CustomMultiCommand, self).command(
+                    t, *args[1:], **kwargs
+                )(f)
+
+                # Add the aliases as commands, but hidden
+                kwargs['hidden'] = True
                 for alias in args[0][1:]:
                     cmd = super(CustomMultiCommand, self).command(
                         alias, *args[1:], **kwargs
