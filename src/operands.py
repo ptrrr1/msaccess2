@@ -1,5 +1,6 @@
 from utils import Utils
 import pandas as pd
+from click import UsageError
 
 class Operands():
 	def __init__(self, fleft, fright, cleft, cright, output):
@@ -93,6 +94,9 @@ class Operands():
 		Operands.write(intersec, 'intersection', self.output)
 
 	def union(self):
+		if self.dfleft.shape[1] != self.dfright.shape[1]:
+			UsageError("Files have mismatched number of columns. Only overlapping columns will be kept.").show()
+		
 		dfright = self.dfright.rename(columns={self.col_name_right: self.col_name_left})
 		
 		union = pd.concat([

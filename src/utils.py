@@ -1,7 +1,6 @@
 import click
 import os
 
-
 class Utils:
     @staticmethod
     def parse_columns(column: (str, ...)) -> (str, str):
