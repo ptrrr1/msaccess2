@@ -1,9 +1,9 @@
 from utils import Utils
 import pandas as pd
-from click import UsageError
+import click
 
 class Operands():
-	def __init__(self, fleft, fright, cleft, cright, output):
+	def __init__(self, fleft: click.Path, fright: click.Path, cleft: str, cright: str, output: click.Path) -> None:
 		self.output = output
 
 		self.dfleft = self.read(fleft)
@@ -20,7 +20,7 @@ class Operands():
 
 		self.initialize_workbook()
 
-	def initialize_workbook(self):
+	def initialize_workbook(self) -> None:
 		with pd.ExcelWriter(
 			self.output,
 			engine='openpyxl',
@@ -38,7 +38,7 @@ class Operands():
 		    )
 
 	@staticmethod
-	def read(file):
+	def read(file: click.Path) -> pd.DataFrame:
 		df = None
 		is_valid, ext = Utils.is_valid_file(file)
 		if is_valid:
@@ -53,7 +53,7 @@ class Operands():
 		return df
 
 	@staticmethod
-	def write(df, sheet_name, output):
+	def write(df: pd.DataFrame, sheet_name: str, output: click.Path) -> None:
 		with pd.ExcelWriter(
 			output,
 			engine='openpyxl',
@@ -66,21 +66,21 @@ class Operands():
 	        )
 		
 
-	def left_not_right(self):
+	def left_not_right(self) -> None:
 		lnr = self.dfleft.loc[
 				~self.dfleft[self.col_name_left].isin(self.col_right)
 			]
 
 		Operands.write(lnr, 'left_not_right', self.output)
 		
-	def right_not_left(self):
+	def right_not_left(self) -> None:
 		rnl = self.dfright.loc[
 				~self.dfright[self.col_name_right].isin(self.col_left)
 			]
 
 		Operands.write(rnl, 'right_not_left', self.output)
 
-	def intersection(self):
+	def intersection(self) -> None:
 		dfright = self.dfright.rename(columns={self.col_name_right: self.col_name_left})
 		
 		intersec = pd.merge(
@@ -93,9 +93,9 @@ class Operands():
 
 		Operands.write(intersec, 'intersection', self.output)
 
-	def union(self):
+	def union(self) -> None:
 		if self.dfleft.shape[1] != self.dfright.shape[1]:
-			UsageError("Files have mismatched number of columns. Only overlapping columns will be kept.").show()
+			click.UsageError("Skipping Union. Files have mismatched number of columns").show()
 		
 		dfright = self.dfright.rename(columns={self.col_name_right: self.col_name_left})
 		
@@ -112,7 +112,7 @@ class Operands():
 		
 		Operands.write(union_distinct, 'union_distinct', self.output)
 
-	def cartesian(self):
+	def cartesian(self) -> None:
 		cartesian = pd.merge(
 		                    self.dfleft,
 		                    self.dfright,

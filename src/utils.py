@@ -15,7 +15,7 @@ class Utils:
         return left_col, right_col    
 
     @staticmethod
-    def is_valid_file(filename) -> (bool, str):
+    def is_valid_file(filename: click.Path) -> (bool, str):
         is_valid = os.path.isfile(filename)
         ext = None
 
