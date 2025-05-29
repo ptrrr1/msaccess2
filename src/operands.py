@@ -96,21 +96,21 @@ class Operands():
 	def union(self) -> None:
 		if self.dfleft.shape[1] != self.dfright.shape[1]:
 			click.UsageError("Skipping Union. Files have mismatched number of columns").show()
+		else:		
+			dfright = self.dfright.rename(columns={self.col_name_right: self.col_name_left})
 		
-		dfright = self.dfright.rename(columns={self.col_name_right: self.col_name_left})
+			union = pd.concat([
+			                  	self.dfleft,
+			                  	dfright
+			                  ],
+			                  ignore_index=True,
+			                  names=list(self.dfleft.columns),
+			                  join='inner' # Keep only overlapping columns
+			                )
 		
-		union = pd.concat([
-		                  	self.dfleft,
-		                  	dfright
-		                  ],
-		                  ignore_index=True,
-		                  names=list(self.dfleft.columns),
-		                  join='inner' # Keep only overlapping columns
-		                )
+			union_distinct = union.drop_duplicates()
 		
-		union_distinct = union.drop_duplicates()
-		
-		Operands.write(union_distinct, 'union_distinct', self.output)
+			Operands.write(union_distinct, 'union_distinct', self.output)
 
 	def cartesian(self) -> None:
 		cartesian = pd.merge(
