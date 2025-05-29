@@ -2,9 +2,6 @@ from utils import Utils, CustomMultiCommand
 from operands import Operands
 import click
 
-# TODO: Implement a list of functions and when flag '--neg' is executed remove them
-# from the list, then iterate over it to perform actions
-
 class CLI():
     pass_operands = click.make_pass_decorator(Operands, ensure=True)
 
@@ -57,14 +54,14 @@ class CLI():
 
 
     @cli.command(['intersection','int'],
-                 help='Performs a Inner Join.')
+                 help='Performs an Inner Join.')
     @pass_operands
     def intersection(operands: Operands) -> None:
         return operands.intersection
 
 
     @cli.command('union',
-                 help='Performs a Union, concatenating Sets vertically.')
+                 help='Performs an Union, concatenating Sets vertically.')
     @pass_operands
     def union(operands: Operands) -> None:
         return operands.union
